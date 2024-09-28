@@ -24,15 +24,21 @@ class Habit(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     place = models.CharField(
         max_length=255,
         verbose_name='Место привычки',
         help_text='Укажите место, где необходимо выполнять привычку',
+        blank=True,
+        null=True,
     )
     time = models.DateTimeField(
         verbose_name='Время выполнения',
         help_text='Укажите время, когда необходимо выполнять привычку',
+        blank=True,
+        null=True,
     )
     action = models.CharField(
         max_length=255,
@@ -54,10 +60,19 @@ class Habit(models.Model):
         verbose_name='Связанная привычка',
         help_text='Привычка, которая связана с другой привычкой, указывать для полезных привычек, но не для приятных',
     )
-    periodicity = models.PositiveIntegerField(
+    periodicity = models.CharField(
+        max_length=255,
         verbose_name='Периодичность выполнения',
         help_text='Укажите периодичность выполнения привычки в днях',
-        default=1,
+        choices=[
+            ('daily', 'Ежедневно'),
+            ('weekly', 'Еженедельно'),
+            ('monthly', 'Ежемесячно'),
+            ('quarterly', 'Ежеквартально'),
+            ('annually', 'Ежегодно'),
+        ],
+        blank=True,
+        null=True,
     )
     reward = models.CharField(
         max_length=255,
@@ -70,6 +85,8 @@ class Habit(models.Model):
         verbose_name='Время для выполнения привычки',
         help_text='Укажите время для выполнения привычки в минутах',
         default=180,
+        blank=True,
+        null=True,
     )
     is_public = models.BooleanField(
         default=False,
