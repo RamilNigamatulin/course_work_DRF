@@ -2,24 +2,6 @@ from django.db import models
 from users.models import User
 
 
-class HabitCategory(models.Model):
-    name = models.CharField(
-        max_length=255,
-        verbose_name='Название категории',
-        help_text='Укажите название категории привычек',
-    )
-    description = models.TextField(
-        verbose_name='Описание категории',
-        help_text='Укажите описание категории привычек',
-        blank=True,
-        null=True,
-    )
-
-    class Meta:
-        verbose_name = 'Категория привычек'
-        verbose_name_plural = 'Категории привычек'
-
-
 class Habit(models.Model):
     user = models.ForeignKey(
         User,
@@ -60,17 +42,9 @@ class Habit(models.Model):
         verbose_name='Связанная привычка',
         help_text='Привычка, которая связана с другой привычкой, указывать для полезных привычек, но не для приятных',
     )
-    periodicity = models.CharField(
-        max_length=255,
+    periodicity = models.PositiveIntegerField(
         verbose_name='Периодичность выполнения',
-        help_text='Укажите периодичность выполнения привычки в днях',
-        choices=[
-            ('daily', 'Ежедневно'),
-            ('weekly', 'Еженедельно'),
-            ('monthly', 'Ежемесячно'),
-            ('quarterly', 'Ежеквартально'),
-            ('annually', 'Ежегодно'),
-        ],
+        help_text='Укажите периодичность выполнения привычки в часах (не более 168 часов-не реже 1 раза в неделю)',
         blank=True,
         null=True,
     )
@@ -83,53 +57,18 @@ class Habit(models.Model):
     )
     time_to_complete = models.PositiveIntegerField(
         verbose_name='Время для выполнения привычки',
-        help_text='Укажите время для выполнения привычки в минутах',
-        default=180,
+        help_text='Укажите время для выполнения привычки в секундах, не более 120 секунд',
         blank=True,
         null=True,
     )
-    is_public = models.BooleanField(
+    is_published = models.BooleanField(
         default=False,
         verbose_name='Признак публичности',
         help_text='Отметьте, если привычка доступна для других пользователей',
         blank=True,
         null=True,
     )
-    category = models.ForeignKey(
-        HabitCategory,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        verbose_name='Категория привычки',
-        help_text='Укажите категорию привычки',
-    )
 
     class Meta:
         verbose_name = 'Привычка'
         verbose_name_plural = 'Привычки'
-
-
-class HabitLog(models.Model):
-    habit = models.ForeignKey(
-        Habit,
-        on_delete=models.CASCADE,
-        related_name='logs',
-    )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='habit_logs'
-    )
-    date = models.DateField(
-        auto_now_add=True,
-        verbose_name='Дата выполнения',
-    )
-    completed = models.BooleanField(
-        default=False,
-        verbose_name='Статус выполнения',
-        help_text='Отметьте, если привычка выполнена',
-    )
-
-    class Meta:
-        verbose_name = 'Лог выполнения привычки'
-        verbose_name_plural = 'Логи выполнения привычек'

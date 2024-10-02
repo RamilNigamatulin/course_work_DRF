@@ -1,80 +1,62 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 
-from habits.models import Habit, HabitLog, HabitCategory
-from habits.serializers import HabitSerializer, HabitLogSerializer, HabitCategorySerializer
-
-
-class HabitCreateAPIView(CreateAPIView):
-    queryset = Habit.objects.all()
-    serializer_class = HabitSerializer
+from habits.models import Habit
+from habits.paginators import HabitsPaginator
+from habits.serializers import HabitSerializer
 
 
 class HabitListAPIView(ListAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
+    pagination_class = HabitsPaginator
+
+    def get_queryset(self):
+        """Открываем доступ только к своим привычкам."""
+        return Habit.objects.filter(user=self.request.user)
 
 
 class HabitRetrieveAPIView(RetrieveAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
 
+    def get_queryset(self):
+        """Открываем доступ только к своим привычкам."""
+        return Habit.objects.filter(user=self.request.user)
+
 
 class HabitUpdateAPIView(UpdateAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
+
+    def get_queryset(self):
+        """Открываем доступ только к своим привычкам."""
+        return Habit.objects.filter(user=self.request.user)
 
 
 class HabitDestroyAPIView(DestroyAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
 
-
-class HabitLogCreateAPIView(CreateAPIView):
-    queryset = HabitLog.objects.all()
-    serializer_class = HabitLogSerializer
-
-
-class HabitLogListAPIView(ListAPIView):
-    queryset = HabitLog.objects.all()
-    serializer_class = HabitLogSerializer
+    def get_queryset(self):
+        """Открываем доступ только к своим привычкам."""
+        return Habit.objects.filter(user=self.request.user)
 
 
-class HabitLogRetrieveAPIView(RetrieveAPIView):
-    queryset = HabitLog.objects.all()
-    serializer_class = HabitLogSerializer
+class HabitCreateAPIView(CreateAPIView):
+    queryset = Habit.objects.all()
+    serializer_class = HabitSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Открываем доступ только к своим привычкам."""
+        return Habit.objects.filter(owner=self.request.user)
+
+    def perform_create(self, serializer):
+        """Привязываем текущего пользователя к создаваемой привычке."""
+        serializer.save(user=self.request.user)
 
 
-class HabitLogUpdateAPIView(UpdateAPIView):
-    queryset = HabitLog.objects.all()
-    serializer_class = HabitLogSerializer
-
-
-class HabitLogDestroyAPIView(DestroyAPIView):
-    queryset = HabitLog.objects.all()
-    serializer_class = HabitLogSerializer
-
-
-class HabitCategoryCreateAPIView(CreateAPIView):
-    queryset = HabitCategory.objects.all()
-    serializer_class = HabitCategorySerializer
-
-
-class HabitCategoryListAPIView(ListAPIView):
-    queryset = HabitCategory.objects.all()
-    serializer_class = HabitCategorySerializer
-
-
-class HabitCategoryRetrieveAPIView(RetrieveAPIView):
-    queryset = HabitCategory.objects.all()
-    serializer_class = HabitCategorySerializer
-
-
-class HabitCategoryUpdateAPIView(UpdateAPIView):
-    queryset = HabitCategory.objects.all()
-    serializer_class = HabitCategorySerializer
-
-
-class HabitCategoryDestroyAPIView(DestroyAPIView):
-    queryset = HabitCategory.objects.all()
-    serializer_class = HabitCategorySerializer
-
+class PublicHabitListAPIView(ListAPIView):
+    queryset = Habit.objects.filter(is_published=True)
+    serializer_class = HabitSerializer
