@@ -44,7 +44,7 @@ class Habit(models.Model):
     )
     periodicity = models.PositiveIntegerField(
         verbose_name='Периодичность выполнения',
-        help_text='Укажите периодичность выполнения привычки в часах (не более 168 часов-не реже 1 раза в неделю)',
+        help_text='Укажите количество выполнений привычки в неделю (не реже 1 раза в неделю)',
         blank=True,
         null=True,
     )

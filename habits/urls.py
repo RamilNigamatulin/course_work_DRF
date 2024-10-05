@@ -1,5 +1,4 @@
 from django.urls import path
-from habits.models import Habit
 from habits.views import (
     HabitCreateAPIView, HabitUpdateAPIView, HabitDestroyAPIView, HabitListAPIView, HabitRetrieveAPIView,
     PublicHabitListAPIView,
