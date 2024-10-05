@@ -17,10 +17,17 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
-    tg_nickname = models.CharField(
+    tg_chat_id = models.CharField(
         max_length=50,
-        verbose_name='Телеграм-никнейм',
-        help_text='Укажите свой Телеграм-никнейм',
+        verbose_name='Телеграм-chat-id',
+        help_text='Укажите свой Телеграм-chat-id',
+        blank=True,
+        null=True,
+    )
+    tg_name = models.CharField(
+        max_length=50,
+        verbose_name='Телеграм ник',
+        help_text='Укажите свой Телеграм ник',
         blank=True,
         null=True,
     )
