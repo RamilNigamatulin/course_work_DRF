@@ -9,10 +9,10 @@ class HabitsTestCase(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create(email='test@test.ru')
-        self.habit_published = Habit.objects.create(action='Опубликованная привычка', periodicity=7, user=self.user,
+        self.habit_published = Habit.objects.create(action='Публичная привычка', periodicity=[0, 1, 2], user=self.user,
                                                     is_published=True)
         self.habit_unpublished = Habit.objects.create(
-            action='Неопубликованная привычка', periodicity=7, user=self.user, is_published=False)
+            action='Непубличная привычка', periodicity=[3, 4, 5], user=self.user, is_published=False)
         self.client.force_authenticate(user=self.user)
 
     def test_create_habit(self):
@@ -20,10 +20,9 @@ class HabitsTestCase(APITestCase):
         url = reverse("habits:habits_create", )
         data = {
             "action": "Тест_привычка_1",
-            "periodicity": 7,
+            "periodicity": [0, 1, 2],
         }
         response = self.client.post(url, data, )
-        # print(response.content)
         self.assertEqual(
             response.status_code, status.HTTP_201_CREATED
         )
@@ -51,7 +50,7 @@ class HabitsTestCase(APITestCase):
         url = reverse("habits:habits_update", args=(self.habit_published.pk,))
         data = {
             "action": "Тест_привычка_1",
-            "periodicity": 7,
+            "periodicity": [0, 1, 2],
         }
         response = self.client.patch(url, data)
         data = response.json()

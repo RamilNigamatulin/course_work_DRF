@@ -2,9 +2,13 @@ import requests
 from config import settings
 
 
-def send_telegram_message(tg_chat_id, message):
+def send_telegram_message(chat_id, text):
     params = {
-        'chat_id': tg_chat_id,
-        'text': message,
+        'chat_id': chat_id,
+        'text': text,
     }
-    requests.get(f'{settings.TELEGRAM_URL}/bot{settings.TELEGRAM_TOKEN}/sendMessage', params=params).json()
+    response = requests.get(f'{settings.TELEGRAM_URL}/bot{settings.TELEGRAM_TOKEN}/sendMessage', params=params)
+    if response.status_code == 200:
+        print("Сообщение успешно отправлено!")
+    else:
+        print(f"Ошибка при отправке сообщения: {response.status_code} - {response.text}")

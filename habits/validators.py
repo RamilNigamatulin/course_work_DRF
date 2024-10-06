@@ -28,11 +28,14 @@ class HabitValidator:
                 raise ValidationError('У приятной привычки не может быть вознаграждения или связанной привычки.')
 
     def validate_periodicity(self, data):
-        """ Накладывает ограничения в виде запрета выполнения привычки реже 1 раза в 7 дней."""
-        if 1 <= data.get('periodicity') <= 7:
-            raise ValidationError(
-                'Привычка должна выполняться не реже 1 раза в течении 7 дней, не более 7 раз в неделю.'
-            )
+        """Накладывает ограничения в виде запрета выполнения привычки реже 1 раза в 7 дней."""
+        periodicity = data.get('periodicity')
+        if not all(0 <= day <= 6 for day in periodicity):
+            raise ValidationError('Дни недели должны быть в диапазоне от 0 до 6.')
+
+        if len(periodicity) < 1 or len(periodicity) > 7:
+            raise ValidationError('Привычка должна выполняться не реже 1 раза '
+                                  'в течении 7 дней, не более 7 раз в неделю.')
 
     def validate_time_to_complete(self, data):
         """ Накладывает ограничения на время выполнения привычки, до 120 секунд."""

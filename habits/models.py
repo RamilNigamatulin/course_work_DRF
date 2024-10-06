@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from users.models import User
 
@@ -16,7 +17,7 @@ class Habit(models.Model):
         blank=True,
         null=True,
     )
-    time = models.DateTimeField(
+    time = models.TimeField(
         verbose_name='Время выполнения',
         help_text='Укажите время, когда необходимо выполнять привычку',
         blank=True,
@@ -42,11 +43,9 @@ class Habit(models.Model):
         verbose_name='Связанная привычка',
         help_text='Привычка, которая связана с другой привычкой, указывать для полезных привычек, но не для приятных',
     )
-    periodicity = models.PositiveIntegerField(
-        verbose_name='Периодичность выполнения',
-        help_text='Укажите количество выполнений привычки в неделю (не реже 1 раза в неделю)',
-        blank=True,
-        null=True,
+    periodicity = ArrayField(
+        models.IntegerField(),
+        default=list
     )
     reward = models.CharField(
         max_length=255,
