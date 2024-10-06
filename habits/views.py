@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from habits.models import Habit
 from habits.paginators import HabitsPaginator
+from habits.permissions import IsOwner
 from habits.serializers import HabitSerializer
 from habits.tasks import notify_habit_created, notify_habit_update
 
@@ -11,6 +12,7 @@ class HabitListAPIView(ListAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
     pagination_class = HabitsPaginator
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         """Открываем доступ только к своим привычкам."""
@@ -20,6 +22,7 @@ class HabitListAPIView(ListAPIView):
 class HabitRetrieveAPIView(RetrieveAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         """Открываем доступ только к своим привычкам."""
@@ -29,6 +32,7 @@ class HabitRetrieveAPIView(RetrieveAPIView):
 class HabitUpdateAPIView(UpdateAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         """Открываем доступ только к своим привычкам."""
@@ -43,6 +47,7 @@ class HabitUpdateAPIView(UpdateAPIView):
 class HabitDestroyAPIView(DestroyAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         """Открываем доступ только к своим привычкам."""
@@ -52,7 +57,7 @@ class HabitDestroyAPIView(DestroyAPIView):
 class HabitCreateAPIView(CreateAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         """Открываем доступ только к своим привычкам."""
