@@ -4,9 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from habits.models import Habit
 from habits.paginators import HabitsPaginator
 from habits.serializers import HabitSerializer
-from django_celery_beat.models import CrontabSchedule, PeriodicTask
-
-from habits.service import send_telegram_message
+from habits.tasks import notify_habit_created, notify_habit_update
 
 
 class HabitListAPIView(ListAPIView):
@@ -36,23 +34,10 @@ class HabitUpdateAPIView(UpdateAPIView):
         """Открываем доступ только к своим привычкам."""
         return Habit.objects.filter(user=self.request.user)
 
-    def periodic_task(self, habit):
-        PeriodicTask.objects.filter(name=f'habit_reminder{habit.id}').delete()
-
-        schedule, _ = CrontabSchedule.objects.get_or_create(
-            minute=habit.time.minute,
-            hour=habit.time.hour,
-            day_of_week='*',
-            day_of_month='*',
-            month_of_year='*',
-        )
-
-        PeriodicTask.objects.create(
-            crontab=schedule,
-            name=f'habit_reminder{habit.id}',
-            task='habit.tasks.habit_reminder',
-        )
-        send_telegram_message.delay(user.tg_chat_id, message)
+    def perform_update(self, serializer):
+        """ Вызываем задачи Celery для отправки уведомления."""
+        habit = serializer.save()
+        notify_habit_update.delay(habit.id)
 
 
 class HabitDestroyAPIView(DestroyAPIView):
@@ -74,27 +59,11 @@ class HabitCreateAPIView(CreateAPIView):
         return Habit.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        """Привязываем текущего пользователя к создаваемой привычке."""
-        serializer.save(user=self.request.user)
-
-    def periodic_task(self, habit):
-
-        # PeriodicTask.objects.filter(name=f'habit_reminder{habit.id}').delete()
-
-        schedule, _ = CrontabSchedule.objects.get_or_create(
-            minute=habit.time.minute,
-            hour=habit.time.hour,
-            day_of_week='*',
-            day_of_month='*',
-            month_of_year='*',
-        )
-
-        PeriodicTask.objects.create(
-            crontab=schedule,
-            name=f'habit_reminder{habit.id}',
-            task='habit.tasks.habit_reminder',
-        )
-        send_telegram_message.delay(user.tg_chat_id, message)
+        """
+        Привязываем текущего пользователя к создаваемой привычке и вызываем задачи Celery для отправки уведомления.
+        """
+        habit = serializer.save(user=self.request.user)
+        notify_habit_created.delay(habit.id)
 
 
 class PublicHabitListAPIView(ListAPIView):

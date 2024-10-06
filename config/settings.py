@@ -4,6 +4,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+# from celery.schedules import crontab
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -67,7 +69,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('NAME'),
-        'USER': 'postgres',  # os.getenv('USER'),
+        'USER': os.getenv('USER'),
         'PASSWORD': os.getenv('PASSWORD'),
         'HOST': os.getenv('HOST'),
         'PORT': os.getenv('PORT'),
@@ -138,3 +140,11 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://read-and-write.example.com",
 ]
+
+CELERY_BEAT_SCHEDULE = {
+    'send_daily_habits': {
+        'task': 'habits.tasks.send_daily_habits',
+        'schedule': 30.0,  # Запускать каждые 30 секунд
+        # 'schedule': crontab(hour=00, minute=00),  # Запускать каждый день в полночь
+    },
+}
