@@ -1,4 +1,5 @@
 from rest_framework.serializers import ValidationError
+from habits.models import Habit
 
 
 class HabitValidator:
@@ -9,6 +10,7 @@ class HabitValidator:
         self.validate_sign_nice_habit(data)
         self.validate_periodicity(data)
         self.validate_time_to_complete(data)
+        self.validate_related_habits(data)
 
     def validate_related_habit_or_reward(self, data):
         """Исключает одновременный выбор вознаграждения и связанной привычки."""
@@ -41,3 +43,11 @@ class HabitValidator:
         """ Накладывает ограничения на время выполнения привычки, до 120 секунд."""
         if data.get('time_to_complete', 0) > 120:
             raise ValidationError('Время выполнения привычки должно быть не более 120 сек.')
+
+    def validate_related_habits(self, data):
+        """Проверяет, не пытаемся ли мы изменить привычку на неприятную, если она связана с другими привычками."""
+        if data.get('id'):
+            habit_id = data['id']
+            related_habits = Habit.objects.filter(related_habit=habit_id)
+            if related_habits.exists() and not data.get('sign_nice_habit'):
+                raise ValidationError('Нельзя сделать привычку неприятной, если она связана с другими привычками.')
