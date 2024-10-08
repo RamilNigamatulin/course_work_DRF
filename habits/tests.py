@@ -21,17 +21,17 @@ class HabitsTestCase(APITestCase):
         data = {
             "action": "Тест_привычка_1",
             "periodicity": [0, 1, 2],
-        }
+            }
         response = self.client.post(url, data, )
         self.assertEqual(
             response.status_code, status.HTTP_201_CREATED
-        )
+            )
         self.assertTrue(
             Habit.objects.all().exists()
-        )
+            )
         self.assertEqual(
             Habit.objects.all().count(), 3
-        )
+            )
 
     def test_habit_retrieve(self):
         """ Тестирование на получение деталей привычки."""
@@ -40,10 +40,10 @@ class HabitsTestCase(APITestCase):
         data = response.json()
         self.assertEqual(
             response.status_code, status.HTTP_200_OK
-        )
+            )
         self.assertEqual(
             data.get("action"), self.habit_published.action
-        )
+            )
 
     def test_habit_update(self):
         """Тестирование обновление привычки."""
@@ -51,15 +51,15 @@ class HabitsTestCase(APITestCase):
         data = {
             "action": "Тест_привычка_1",
             "periodicity": [0, 1, 2],
-        }
+            }
         response = self.client.patch(url, data)
         data = response.json()
         self.assertEqual(
             response.status_code, status.HTTP_200_OK
-        )
+            )
         self.assertEqual(
             data.get("action"), "Тест_привычка_1"
-        )
+            )
 
     def test_habit_delete(self):
         """ Тестирование удаление привычки."""
@@ -67,55 +67,56 @@ class HabitsTestCase(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(
             response.status_code, status.HTTP_204_NO_CONTENT
-        )
+            )
         self.assertEqual(
             Habit.objects.all().count(), 1
-        )
+            )
 
     def test_habit_list(self):
         """Тестирование получения списка всех привычек."""
         url = reverse("habits:habits_list", )
         response = self.client.get(url)
         data = response.json()
-        result = {'count': 2,
-                  'next': None,
-                  'previous': None,
-                  'results': [
-                      {
-                          'id': self.habit_published.pk,
-                          'place': None,
-                          'time': None,
-                          'action': self.habit_published.action,
-                          'sign_nice_habit': False,
-                          'periodicity': self.habit_published.periodicity,
-                          'reward': None,
-                          'time_to_complete': None,
-                          'is_published': True,
-                          'user': self.user.pk,
-                          'related_habit': None
-                      },
-                      {
-                          'id': self.habit_unpublished.pk,
-                          'place': None,
-                          'time': None,
-                          'action': self.habit_unpublished.action,
-                          'sign_nice_habit': False,
-                          'periodicity': self.habit_unpublished.periodicity,
-                          'reward': None,
-                          'time_to_complete': None,
-                          'is_published': False,
-                          'user': self.user.pk,
-                          'related_habit': None
-                      }
-                  ]
-                  }
+        result = {
+            'count': 2,
+            'next': None,
+            'previous': None,
+            'results': [
+                {
+                    'id': self.habit_published.pk,
+                    'place': None,
+                    'time': None,
+                    'action': self.habit_published.action,
+                    'sign_nice_habit': False,
+                    'periodicity': self.habit_published.periodicity,
+                    'reward': None,
+                    'time_to_complete': None,
+                    'is_published': True,
+                    'user': self.user.pk,
+                    'related_habit': None
+                    },
+                {
+                    'id': self.habit_unpublished.pk,
+                    'place': None,
+                    'time': None,
+                    'action': self.habit_unpublished.action,
+                    'sign_nice_habit': False,
+                    'periodicity': self.habit_unpublished.periodicity,
+                    'reward': None,
+                    'time_to_complete': None,
+                    'is_published': False,
+                    'user': self.user.pk,
+                    'related_habit': None
+                    }
+                ]
+            }
 
         self.assertEqual(
             response.status_code, status.HTTP_200_OK
-        )
+            )
         self.assertEqual(
             data, result
-        )
+            )
 
     def test_public_habits_list(self):
         """Тестирование получения списка опубликованных привычек."""
@@ -123,25 +124,25 @@ class HabitsTestCase(APITestCase):
         response = self.client.get(url)
         data = response.json()
         result = {
-                'count': 1,
-                'next': None,
-                'previous': None,
-                'results': [
-                    {
-                        'id': self.habit_published.pk,
-                        'place': None,
-                        'time': None,
-                        'action': self.habit_published.action,
-                        'sign_nice_habit': False,
-                        'periodicity': self.habit_published.periodicity,
-                        'reward': None,
-                        'time_to_complete': None,
-                        'is_published': True,
-                        'user': self.user.pk,
-                        'related_habit': None
+            'count': 1,
+            'next': None,
+            'previous': None,
+            'results': [
+                {
+                    'id': self.habit_published.pk,
+                    'place': None,
+                    'time': None,
+                    'action': self.habit_published.action,
+                    'sign_nice_habit': False,
+                    'periodicity': self.habit_published.periodicity,
+                    'reward': None,
+                    'time_to_complete': None,
+                    'is_published': True,
+                    'user': self.user.pk,
+                    'related_habit': None
                     }
                 ]
-        }
+            }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data, result)
